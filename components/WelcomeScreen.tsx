@@ -51,7 +51,6 @@ const WelcomeScreen: React.FC = () => {
             <span className="truncate z-10">授权摄像头</span>
           </button>
         </div>
-        <p className="text-gray-700 text-sm font-normal leading-normal py-3 text-center underline cursor-pointer hover:text-black transition-colors">以后再说</p>
       </div>
     </div>
   );
