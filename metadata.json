@@ -1,0 +1,7 @@
+{
+  "name": "Magic Brush AI",
+  "description": "An innovative mobile H5 application that allows users to draw in the air using hand gestures captured by their phone's camera. The app tracks these gestures to create line art, which is then transformed into beautiful, stylized artwork using Google Gemini's multimodal and image generation models.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
