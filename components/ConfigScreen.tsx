@@ -29,6 +29,11 @@ const ConfigScreen: React.FC = () => {
         setLoadingType
     } = useAppContext();
 
+    /**
+     * Handles the "Get Inspiration" feature.
+     * If the prompt is empty, it analyzes the line art to generate a new prompt.
+     * If the prompt has content, it optimizes the existing text.
+     */
     const handleGetInspiration = useCallback(async () => {
         setLoadingType('inspiration');
         const inspirationMessages = [
@@ -45,6 +50,7 @@ const ConfigScreen: React.FC = () => {
         try {
             let newPrompt: string;
             if (prompt.trim() === '') {
+                // Generate prompt from image if prompt is empty
                 if (!lineArt) {
                     setError("请先绘制线条图以获取灵感");
                     setIsLoading(false);
@@ -52,6 +58,7 @@ const ConfigScreen: React.FC = () => {
                 }
                 newPrompt = await getInspirationFromImage(lineArt);
             } else {
+                // Optimize the existing prompt
                 newPrompt = await optimizePromptWithText(prompt);
             }
             setPrompt(newPrompt);
@@ -65,12 +72,17 @@ const ConfigScreen: React.FC = () => {
         }
     }, [lineArt, prompt, setIsLoading, setError, setPrompt, setLoadingText, setLoadingType]);
     
+    /**
+     * Handles the main image generation logic.
+     * @param {boolean} isGuess - If true, runs the "AI Guess" agent. Otherwise, runs the "Drawing Assistant" agent.
+     */
     const handleGenerate = useCallback(async (isGuess: boolean) => {
         if (!lineArt) {
             setError("没有可用于生成的线条图");
             return;
         }
         
+        // For standard generation, a prompt is required.
         if (!isGuess) {
             if (prompt.trim() === '') {
                 setError("请输入创意提示词");
@@ -79,6 +91,7 @@ const ConfigScreen: React.FC = () => {
         }
         
         setLoadingType('generation');
+        // Fetch a funny quote for the loading screen to improve user experience.
         let jokeText = "正在为您生成天才画作...";
         try {
             jokeText = await getFunnyJokeOrQuote();
@@ -91,6 +104,7 @@ const ConfigScreen: React.FC = () => {
         const startTime = Date.now();
         try {
             let generated: string;
+            // Branch logic based on which generation mode was chosen.
             if (isGuess) {
                 generated = await runAiGuessAgent(lineArt);
             } else {
@@ -98,8 +112,10 @@ const ConfigScreen: React.FC = () => {
             }
             
             const endTime = Date.now();
+            // Use a descriptive style name for the preview screen.
             const finalStyle = isGuess ? "AI 猜猜" : (style || '自定义');
 
+            // Update app state with the results and navigate to the preview screen.
             setRenderTime((endTime - startTime) / 1000);
             setGeneratedImage(generated);
             setStyle(finalStyle);
@@ -115,12 +131,16 @@ const ConfigScreen: React.FC = () => {
         }
     }, [lineArt, prompt, style, setIsLoading, setError, setGeneratedImage, setRenderTime, setScreen, setStyle, setLoadingText, setLoadingType]);
 
+    /**
+     * Resets the style and prompt fields to their initial empty states.
+     */
     const handleReset = () => {
         // Set style to a non-matching value to visually deselect all options.
         setStyle(''); 
         setPrompt('');
     };
 
+    // Derived state to control button disabled status
     const isPromptEmpty = prompt.trim() === '';
 
     return (
